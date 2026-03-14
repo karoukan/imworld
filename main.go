@@ -94,6 +94,7 @@ func main() {
 
 		for s := 0; s < len(world.Sectors); s++ {
 			randomevent(&world, s)
+			population(&world, s)
 			for k := 0; k < len(world.Sectors[s].Events); k++ {
 				for i := 0; i < len(world.Sectors[s].Factions); i++ {
 					if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {

@@ -16,8 +16,7 @@ func randomevent(world *World, s int) {
 	}
 }
 
-func population() {
-	// Population croit et décroit
-	// de manière aléatoire elle augmente ou baisse
-
+func population(world *World, s int) {
+	world.Sectors[s].Population += world.Sectors[s].Population / 100
+	fmt.Println("POP INCREASE:", world.Sectors[s].Population)
 }
