@@ -38,6 +38,7 @@ func main() {
 						Reputation: 1,
 						Type:       "enterprise",
 						Members:    100,
+						Alive:      true,
 						Resources: Resources{
 							Credits:   10,
 							Influence: 15,
@@ -52,6 +53,7 @@ func main() {
 						Reputation: 1,
 						Members:    100,
 						Type:       "collectif",
+						Alive:      true,
 						Resources: Resources{
 							Credits:   10,
 							Influence: 4,
@@ -88,6 +90,7 @@ func main() {
 						Reputation: 1,
 						Members:    100,
 						Type:       "classified",
+						Alive:      true,
 						Resources: Resources{
 							Credits:   10,
 							Influence: 4,
@@ -102,6 +105,7 @@ func main() {
 						Reputation: 1,
 						Type:       "mafia",
 						Members:    100,
+						Alive:      true,
 						Resources: Resources{
 							Credits:   10,
 							Influence: 10,
@@ -129,12 +133,12 @@ func main() {
 				for i := 0; i < len(world.Sectors[s].Factions); i++ {
 
 					membersJoined := rand.Intn(100)
-					if membersJoined > 17 && newPopulation >= 100 {
+					if membersJoined > 17 && newPopulation >= 100 && world.Sectors[s].Factions[i].Alive == true {
 						populationJoinFaction(&world, s, i, newPopulation)
 						fmt.Println(world.Sectors[s].Factions[i].Name, "TOTAL MEMBER:", world.Sectors[s].Factions[i].Members)
 					}
 
-					if world.Sectors[s].Harvest == true {
+					if world.Sectors[s].Harvest == true && world.Sectors[s].Factions[i].Alive == true {
 						gathering(&world, s, i)
 						fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
 					}
@@ -144,7 +148,7 @@ func main() {
 					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
 					// 	for
 					// }
-					war(&world.Sectors[s], i)
+					war(&world, &world.Sectors[s], i)
 					world.Sectors[s].Harvest = true
 				}
 			}

@@ -32,10 +32,19 @@ type Faction struct {
 	Members    int    //Nombre d'adhérents
 	Type       string //Entreprise / collectif / mafia
 	War        bool
+	Memory     []Memory
+	Alive      bool
 }
 
 type Resources struct {
 	Data      int
 	Influence int
 	Credits   int
+}
+
+type Memory struct {
+	Age   int
+	Where string
+	Who   string
+	What  string
 }

@@ -10,7 +10,7 @@ func endwar(s *Sector, i int) {
 	s.Factions[i].Strength = 2
 }
 
-func war(s *Sector, attacker int) {
+func war(w *World, s *Sector, attacker int) {
 	fight := rand.Intn(20)
 
 	if fight > 17 {
@@ -20,7 +20,9 @@ func war(s *Sector, attacker int) {
 			fmt.Println(s.Factions[attacker].Name, " PREPARE FOR WAR")
 
 			for defender := 0; defender < len(s.Factions); defender++ {
-				if attacker != defender && s.Factions[defender].War == false {
+				bonusWar := warMemory(s, s.Factions[attacker].Name, defender)
+
+				if attacker != defender && s.Factions[defender].War == false && s.Factions[defender].Alive == true {
 					switch s.Factions[attacker].Type {
 					case "enterprise":
 						if s.Factions[defender].Resources.Credits > 5 {
@@ -29,15 +31,29 @@ func war(s *Sector, attacker int) {
 
 							for s.Factions[attacker].War == true && s.Factions[defender].War == true {
 								//Fight conditions
-								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits)
+								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits, bonusWar)
+								attackerMembersTotal, defenderMembersTotal := memberDie(s, attacker, defender, s.Factions[attacker].Members, s.Factions[defender].Members)
+
 								if defenderFaction == 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
 								}
+
+								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
+									s.Factions[attacker].War = false
+									s.Factions[defender].War = false
+									endwar(s, attacker)
+								}
+
+								s.Factions[attacker].Members = attackerMembersTotal
+								s.Factions[defender].Members = defenderMembersTotal
+
 								s.Factions[attacker].Resources.Credits = attackerFaction
 								s.Factions[defender].Resources.Credits = defenderFaction
-								fmt.Println(attackerFaction, defenderFaction)
+
+								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
+								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
 
 							}
 						}
@@ -48,34 +64,62 @@ func war(s *Sector, attacker int) {
 
 							for s.Factions[attacker].War == true && s.Factions[defender].War == true {
 								//Fight conditions
-								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Data, s.Factions[defender].Resources.Data)
+								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits, bonusWar)
+								attackerMembersTotal, defenderMembersTotal := memberDie(s, attacker, defender, s.Factions[attacker].Members, s.Factions[defender].Members)
+
 								if defenderFaction == 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
 								}
-								s.Factions[attacker].Resources.Data = attackerFaction
-								s.Factions[defender].Resources.Data = defenderFaction
-								fmt.Println(attackerFaction, defenderFaction)
+
+								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
+									s.Factions[attacker].War = false
+									s.Factions[defender].War = false
+									endwar(s, attacker)
+								}
+
+								s.Factions[attacker].Members = attackerMembersTotal
+								s.Factions[defender].Members = defenderMembersTotal
+
+								s.Factions[attacker].Resources.Credits = attackerFaction
+								s.Factions[defender].Resources.Credits = defenderFaction
+
+								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
+								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
 
 							}
 						}
 					case "mafia":
-						if s.Factions[defender].Resources.Credits > 5 {
+						if s.Factions[defender].Resources.Credits > 5 && s.Factions[defender].Members > 100 {
 							s.Factions[defender].War = true
 							fmt.Println(s.Factions[defender].Name, "vs", s.Factions[attacker].Name)
 
 							for s.Factions[attacker].War == true && s.Factions[defender].War == true {
 								//Fight conditions
-								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits)
+								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits, bonusWar)
+								attackerMembersTotal, defenderMembersTotal := memberDie(s, attacker, defender, s.Factions[attacker].Members, s.Factions[defender].Members)
+
 								if defenderFaction == 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
 								}
+
+								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
+									s.Factions[attacker].War = false
+									s.Factions[defender].War = false
+									endwar(s, attacker)
+								}
+
+								s.Factions[attacker].Members = attackerMembersTotal
+								s.Factions[defender].Members = defenderMembersTotal
+
 								s.Factions[attacker].Resources.Credits = attackerFaction
 								s.Factions[defender].Resources.Credits = defenderFaction
-								fmt.Println(attackerFaction, defenderFaction)
+
+								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
+								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
 
 							}
 						}
@@ -86,8 +130,8 @@ func war(s *Sector, attacker int) {
 
 							for s.Factions[attacker].War == true && s.Factions[defender].War == true {
 								//Fight conditions
-								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits)
-								attackerMembersTotal, defenderMembersTotal := memberDie(s.Factions[attacker].Members, s.Factions[defender].Members)
+								attackerFaction, defenderFaction := steal(s.Factions[attacker].Resources.Credits, s.Factions[defender].Resources.Credits, bonusWar)
+								attackerMembersTotal, defenderMembersTotal := memberDie(s, attacker, defender, s.Factions[attacker].Members, s.Factions[defender].Members)
 
 								if defenderFaction == 0 {
 									s.Factions[attacker].War = false
@@ -113,6 +157,13 @@ func war(s *Sector, attacker int) {
 							}
 						}
 					}
+
+					s.Factions[defender].Memory = append(s.Factions[defender].Memory, Memory{
+						Age:   w.WorldTimer,
+						Who:   s.Factions[attacker].Name,
+						Where: s.Name,
+						What:  "Attack",
+					})
 				}
 			}
 			s.Factions[attacker].War = false
@@ -120,7 +171,19 @@ func war(s *Sector, attacker int) {
 	}
 }
 
-func memberDie(attMembersTotal int, defMembersTotal int) (int, int) {
+func warMemory(s *Sector, attacker string, defender int) int {
+	count := 0
+
+	for n := 0; n < len(s.Factions[defender].Memory); n++ {
+		if attacker == s.Factions[defender].Memory[n].Who {
+			count++
+		}
+	}
+
+	return s.Factions[defender].Strength + count
+}
+
+func memberDie(s *Sector, attacker, defender, attMembersTotal int, defMembersTotal int) (int, int) {
 	memberDieAtt := rand.Intn(10)
 	memberDieDef := rand.Intn(10)
 
@@ -128,24 +191,31 @@ func memberDie(attMembersTotal int, defMembersTotal int) (int, int) {
 	dieDefMembers := defMembersTotal - memberDieDef
 
 	if dieAttMembers <= 0 {
-		dieAttMembers = 1
+		s.Factions[attacker].Alive = false
+		fmt.Println(s.Factions[attacker].Name, "HAS GONE")
 	}
 
 	if dieDefMembers <= 0 {
-		dieDefMembers = 1
+		s.Factions[defender].Alive = false
+		fmt.Println(s.Factions[defender].Name, "HAS GONE")
 	}
 
 	return dieAttMembers, dieDefMembers
 }
 
-func steal(attRes int, defRes int) (int, int) { // Steal resource during ATTACK
+func steal(attRes int, defRes int, bonusWar int) (int, int) { // Steal resource during ATTACK
 	amount := defRes / 10
 
 	if amount == 0 {
 		amount = 1
 	}
 
-	newDefRes := defRes - amount
+	newDefRes := defRes - amount + bonusWar
+
+	if bonusWar >= amount {
+		newDefRes = defRes - amount + bonusWar/2
+	}
+
 	newAttRes := attRes + amount
 	return newAttRes, newDefRes
 }
