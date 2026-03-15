@@ -35,7 +35,12 @@ func main() {
 						Strength:   2,
 						Ideology:   "Neutral",
 						Reputation: 1,
-						Resources:  3,
+						Type:       "enterprise",
+						Resources: Resources{
+							Credits:   10,
+							Influence: 15,
+							Data:      2,
+						},
 					},
 					{
 						id:         2,
@@ -43,7 +48,12 @@ func main() {
 						Strength:   3,
 						Ideology:   "Xeno",
 						Reputation: 1,
-						Resources:  5,
+						Type:       "collectif",
+						Resources: Resources{
+							Credits:   10,
+							Influence: 4,
+							Data:      12,
+						},
 					},
 				},
 			},
@@ -73,7 +83,12 @@ func main() {
 						Strength:   8,
 						Ideology:   "Loyal",
 						Reputation: 1,
-						Resources:  10,
+						Type:       "classified",
+						Resources: Resources{
+							Credits:   10,
+							Influence: 4,
+							Data:      12,
+						},
 					},
 					{
 						id:         2,
@@ -81,7 +96,12 @@ func main() {
 						Strength:   6,
 						Ideology:   "Bad",
 						Reputation: 1,
-						Resources:  5,
+						Type:       "mafia",
+						Resources: Resources{
+							Credits:   10,
+							Influence: 10,
+							Data:      2,
+						},
 					},
 				},
 			},
@@ -92,17 +112,22 @@ func main() {
 
 	for {
 		world.WorldTimer++
-		time.Sleep(time.Minute)
+		time.Sleep(time.Second)
 
 		for s := 0; s < len(world.Sectors); s++ {
 			randomevent(&world, s)
 			population(&world, s)
 			for k := 0; k < len(world.Sectors[s].Events); k++ {
 				for i := 0; i < len(world.Sectors[s].Factions); i++ {
-					if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
-						world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
-						// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
+					if world.Sectors[s].Harvest == true {
+						gathering(&world, s, i)
+						fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
 					}
+					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
+					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
+					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
+					// 	for
+					// }
 					war(&world.Sectors[s], i)
 					world.Sectors[s].Harvest = true
 				}

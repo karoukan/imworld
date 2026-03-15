@@ -28,7 +28,14 @@ type Faction struct {
 	Strength   int
 	Ideology   string
 	Reputation int
-	Resources  int
+	Resources  Resources
 	Members    int
+	Type       string //Entreprise / collectif / mafia
 	War        bool
+}
+
+type Resources struct {
+	Data      int
+	Influence int
+	Credits   int
 }

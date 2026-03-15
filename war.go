@@ -6,46 +6,51 @@ import (
 )
 
 func endwar(s *Sector, i int) {
-	s.Factions[i].Resources = 2
+	s.Factions[i].Resources.Credits = 2
 	s.Factions[i].Strength = 2
 }
 
-func war(s *Sector, i int) {
+func war(s *Sector, attacker int) {
 	fight := rand.Intn(20)
 
 	if fight > 17 {
-		if s.Factions[i].Resources >= 20 && s.Factions[i].War != true {
-			s.Factions[i].War = true
+		if s.Factions[attacker].War != true {
+			s.Factions[attacker].War = true
 			s.Harvest = false
-			fmt.Println(s.Factions[i].Name, ": WORLD DOMINATION :", s.Factions[i].War)
+			fmt.Println(s.Factions[attacker].Name, " PREPARE FOR WAR")
 
-			for j := 0; j < len(s.Factions); j++ {
-				if i != j && s.Factions[j].War == false && s.Factions[j].Resources > 5 {
-					s.Factions[j].War = true
-					fmt.Println(s.Factions[j].Name, "vs", s.Factions[i].Name)
+			for defender := 0; defender < len(s.Factions); defender++ {
+				if attacker != defender && s.Factions[defender].War == false {
+					if s.Factions[attacker].Type == "enterprise" {
+						if s.Factions[defender].Resources.Credits > 5 {
+							s.Factions[defender].War = true
+							fmt.Println(s.Factions[defender].Name, "vs", s.Factions[attacker].Name)
 
-					for s.Factions[i].War == true && s.Factions[j].War == true {
-						resourcesSteal := 0
-						for s.Factions[j].Resources >= 5 {
-							// fmt.Println("RESOURCES(", s.Factions[i].Name, ") BEFORE STEAL", s.Factions[i].Resources)
-							// fmt.Println("RESOURCES(", s.Factions[j].Name, ") BEFORE STEAL", s.Factions[j].Resources)
-							resourcesSteal = s.Factions[j].Resources / 10
+							for s.Factions[attacker].War == true && s.Factions[defender].War == true {
+								resourcesSteal := 0
+								for s.Factions[defender].Resources.Credits >= 5 {
+									// fmt.Println("RESOURCES(", s.Factions[i].Name, ") BEFORE STEAL", s.Factions[i].Resources)
+									// fmt.Println("RESOURCES(", s.Factions[defender].Name, ") BEFORE STEAL", s.Factions[defender].Resources)
+									resourcesSteal = s.Factions[defender].Resources.Credits / 10
 
-							if resourcesSteal == 0 {
-								resourcesSteal = 1
-								s.Factions[j].War = false
-								s.Factions[i].War = false
-								endwar(s, i)
+									if resourcesSteal == 0 {
+										resourcesSteal = 1
+										s.Factions[defender].War = false
+										s.Factions[attacker].War = false
+										endwar(s, attacker)
+									}
+
+									s.Factions[defender].Resources.Credits -= resourcesSteal
+									s.Factions[attacker].Resources.Credits += resourcesSteal
+									// fmt.Println("RESOURCES(", s.Factions[defender].Name, ") AFTER STEAL", s.Factions[defender].Resources)
+									// fmt.Println("RESOURCES(", s.Factions[i].Name, ") AFTER STEAL", s.Factions[i].Resources)
+								}
 							}
-
-							s.Factions[j].Resources -= resourcesSteal
-							s.Factions[i].Resources += resourcesSteal
-							// fmt.Println("RESOURCES(", s.Factions[j].Name, ") AFTER STEAL", s.Factions[j].Resources)
-							// fmt.Println("RESOURCES(", s.Factions[i].Name, ") AFTER STEAL", s.Factions[i].Resources)
 						}
 					}
 				}
 			}
+
 		}
 	}
 }
