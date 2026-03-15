@@ -24,6 +24,7 @@ func main() {
 						Impact: 4,
 					},
 				},
+				Name:       "Sector A",
 				Size:       10,
 				Population: 10000,
 				Location:   1,
@@ -61,6 +62,7 @@ func main() {
 						Impact: 4,
 					},
 				},
+				Name:       "CITY 17",
 				Size:       5,
 				Population: 1000,
 				Location:   2,
@@ -90,7 +92,7 @@ func main() {
 
 	for {
 		world.WorldTimer++
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 
 		for s := 0; s < len(world.Sectors); s++ {
 			randomevent(&world, s)

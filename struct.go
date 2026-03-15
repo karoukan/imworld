@@ -14,6 +14,7 @@ type Event struct {
 type Sector struct {
 	Harvest    bool
 	Fight      bool
+	Name       string
 	Size       int
 	Population int
 	Location   int //peut etre mettre un float si on veut des coord GPS à voir plus tard ?
@@ -28,5 +29,6 @@ type Faction struct {
 	Ideology   string
 	Reputation int
 	Resources  int
+	Members    int
 	War        bool
 }
