@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -120,14 +121,18 @@ func main() {
 
 		for s := 0; s < len(world.Sectors); s++ {
 			randomevent(&world, s)
-			population(&world, s)
+
+			newPopulation := population(&world, s)
+			world.Sectors[s].Population = newPopulation
+
 			for k := 0; k < len(world.Sectors[s].Events); k++ {
 				for i := 0; i < len(world.Sectors[s].Factions); i++ {
 
-					// MembersJoined := rand.Intn(100)
-					// if MembersJoined > 17 {
-					// 	populationJoinFaction(&world, s, i)
-					// }
+					membersJoined := rand.Intn(100)
+					if membersJoined > 17 && newPopulation >= 100 {
+						populationJoinFaction(&world, s, i, newPopulation)
+						fmt.Println(world.Sectors[s].Factions[i].Name, "TOTAL MEMBER:", world.Sectors[s].Factions[i].Members)
+					}
 
 					if world.Sectors[s].Harvest == true {
 						gathering(&world, s, i)

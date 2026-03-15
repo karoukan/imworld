@@ -27,17 +27,21 @@ func randomevent(world *World, s int) {
 	}
 }
 
-func population(world *World, s int) {
-	world.Sectors[s].Population += world.Sectors[s].Population / 100
-	fmt.Println("POP(", world.Sectors[s].Name, ") INCREASE:", world.Sectors[s].Population)
+func population(world *World, s int) int {
+	if rand.Intn(100) <= 40 {
+		pop := world.Sectors[s].Population + world.Sectors[s].Population/100
+		fmt.Println("POP(", world.Sectors[s].Name, ") INCREASE:", world.Sectors[s].Population)
+
+		return pop
+	}
+
+	return world.Sectors[s].Population
 }
 
-func populationJoinFaction(world *World, s int, i int) {
-	newMembers := rand.Intn(world.Sectors[s].Population) / 10000
+func populationJoinFaction(world *World, s int, i int, pop int) {
+	newMembers := rand.Intn(pop) / 100
 
 	if newMembers > 0 {
 		world.Sectors[s].Factions[i].Members += newMembers
 	}
-
-	fmt.Println(world.Sectors[s].Factions[i].Members, "NEW MEMBERS JOINED", world.Sectors[s].Factions[i].Name)
 }
