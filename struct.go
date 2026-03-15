@@ -29,7 +29,7 @@ type Faction struct {
 	Ideology   string
 	Reputation int
 	Resources  Resources
-	Members    int
+	Members    int    //Nombre d'adhérents
 	Type       string //Entreprise / collectif / mafia
 	War        bool
 }
