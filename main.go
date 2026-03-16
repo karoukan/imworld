@@ -26,15 +26,20 @@ func main() {
 					},
 				},
 				Name:       "Sector A",
-				Size:       10,
+				Size:       2,
 				Population: 10000,
 				Location:   1,
 				Districts: []District{
 					{
-						Name:            "Mineral Zone",
-						Population:      10000,
-						Size:            10,
-						Infrastructures: []Infrastructure{{}},
+						Name:       "Ker-Uhel",
+						Population: 5000,
+						Size:       1,
+						Infrastructures: []Infrastructure{{
+							Name:  "Monee",
+							Type:  "Bank",
+							State: "Ready",
+							InUse: true,
+						}},
 						Factions: []Faction{
 							{
 								id:         1,
@@ -76,6 +81,18 @@ func main() {
 							},
 						},
 					},
+					{
+						Name:       "Ar Santé",
+						Population: 5000,
+						Size:       1,
+						Infrastructures: []Infrastructure{{
+							Name:  "L'entrepot",
+							Type:  "Warehouse",
+							State: "Ready",
+							InUse: true,
+						}},
+						Factions: []Faction{},
+					},
 				},
 			},
 			{
@@ -99,6 +116,15 @@ func main() {
 				Location:   2,
 				Districts: []District{
 					{
+						Name:       "White Mesa",
+						Population: 450,
+						Size:       2,
+						Infrastructures: []Infrastructure{{
+							Name:  "Anormal Material Labs",
+							Type:  "Research Center",
+							State: "Maintenance",
+							InUse: true,
+						}},
 						Factions: []Faction{
 							{
 								id:         1,
@@ -132,6 +158,18 @@ func main() {
 							},
 						},
 					},
+					{
+						Name:       "Nex",
+						Population: 550,
+						Size:       3,
+						Infrastructures: []Infrastructure{{
+							Name:  "Freewoman",
+							Type:  "Factory",
+							State: "Building",
+							InUse: false,
+						}},
+						Factions: []Faction{},
+					},
 				},
 			},
 		},
@@ -143,36 +181,39 @@ func main() {
 		world.WorldTimer++
 		time.Sleep(time.Second)
 
-		for s := 0; s < len(world.Sectors); s++ {
-			randomevent(&world, s)
+		for AllSectors := 0; AllSectors < len(world.Sectors); AllSectors++ { //Fetch sur tous les secteurs
+			randomevent(&world, AllSectors)
 
-			newPopulation := population(&world, s)
-			world.Sectors[s].Population = newPopulation
+			newPopulation := population(&world, AllSectors)
+			world.Sectors[AllSectors].Population = newPopulation
 
-			for i := 0; i < len(world.Sectors[s].Factions); i++ {
+			for AllDistricts := 0; AllDistricts < len(world.Sectors[AllSectors].Districts); AllDistricts++ { //Fetch sur tous les districts
+				district_l := &world.Sectors[AllSectors].Districts[AllDistricts]
+				// sector_l := &world.Sectors[AllSectors]
+				for AllFactions := 0; AllFactions < len(district_l.Factions); AllFactions++ { //Fetch sur toutes les factions
+					membersJoined := rand.Intn(100)
+					if membersJoined > 17 && newPopulation >= 100 && district_l.Factions[AllFactions].Alive == true {
+						populationJoinFaction(&world, AllSectors, AllDistricts, AllFactions, newPopulation)
+						fmt.Println(district_l.Factions[AllFactions].Name, "TOTAL MEMBER:", district_l.Factions[AllFactions].Members)
+					}
 
-				membersJoined := rand.Intn(100)
-				if membersJoined > 17 && newPopulation >= 100 && world.Sectors[s].Factions[i].Alive == true {
-					populationJoinFaction(&world, s, i, newPopulation)
-					fmt.Println(world.Sectors[s].Factions[i].Name, "TOTAL MEMBER:", world.Sectors[s].Factions[i].Members)
+					if world.Sectors[AllSectors].Harvest == true && district_l.Factions[AllFactions].Alive == true {
+						gathering(&world, AllSectors, AllDistricts, AllFactions)
+						fmt.Println(district_l.Factions[AllFactions].Name, "GATHERING:", district_l.Factions[AllFactions].Resources)
+					}
+
+					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
+					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
+					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
+					// 	for
+					// }
+
+					if district_l.Factions[AllFactions].Alive == true {
+						initTrade(&world, &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+						war(&world, &world.Sectors[AllSectors], &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+					}
 				}
-
-				if world.Sectors[s].Harvest == true && world.Sectors[s].Factions[i].Alive == true {
-					gathering(&world, s, i)
-					fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
-				}
-
-				// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
-				// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
-				// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
-				// 	for
-				// }
-				if world.Sectors[s].Factions[i].Alive == true {
-					// initTrade(&world, &world.Sectors[s], i)
-					// war(&world, &world.Sectors[s], i)
-				}
-
-				world.Sectors[s].Harvest = true
+				world.Sectors[AllSectors].Harvest = true
 			}
 		}
 	}

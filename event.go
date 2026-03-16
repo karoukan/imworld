@@ -38,10 +38,10 @@ func population(world *World, s int) int {
 	return world.Sectors[s].Population
 }
 
-func populationJoinFaction(world *World, s int, i int, pop int) {
+func populationJoinFaction(world *World, sector int, district int, faction int, pop int) {
 	newMembers := rand.Intn(pop) / 100
 
 	if newMembers > 0 {
-		world.Sectors[s].Factions[i].Members += newMembers
+		world.Sectors[sector].Districts[district].Factions[faction].Members += newMembers
 	}
 }
