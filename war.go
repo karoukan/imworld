@@ -38,12 +38,14 @@ func war(w *World, s *Sector, attacker int) {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								s.Factions[attacker].Members = attackerMembersTotal
@@ -71,12 +73,14 @@ func war(w *World, s *Sector, attacker int) {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								s.Factions[attacker].Members = attackerMembersTotal
@@ -104,12 +108,14 @@ func war(w *World, s *Sector, attacker int) {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								s.Factions[attacker].Members = attackerMembersTotal
@@ -137,12 +143,14 @@ func war(w *World, s *Sector, attacker int) {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
 									s.Factions[attacker].War = false
 									s.Factions[defender].War = false
 									endwar(s, attacker)
+									break
 								}
 
 								s.Factions[attacker].Members = attackerMembersTotal
@@ -192,11 +200,13 @@ func memberDie(s *Sector, attacker, defender, attMembersTotal int, defMembersTot
 
 	if dieAttMembers <= 0 {
 		s.Factions[attacker].Alive = false
+		dieAttMembers = 0
 		fmt.Println(s.Factions[attacker].Name, "HAS GONE")
 	}
 
 	if dieDefMembers <= 0 {
 		s.Factions[defender].Alive = false
+		dieDefMembers = 0
 		fmt.Println(s.Factions[defender].Name, "HAS GONE")
 	}
 

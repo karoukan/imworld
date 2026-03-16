@@ -20,6 +20,7 @@ type Sector struct {
 	Location   int //peut etre mettre un float si on veut des coord GPS à voir plus tard ?
 	Factions   []Faction
 	Events     []Event
+	Districts  []District
 }
 
 type Faction struct {
@@ -47,4 +48,20 @@ type Memory struct {
 	Where string
 	Who   string
 	What  string
+}
+
+type District struct {
+	Population      int
+	Name            string
+	Size            int
+	Location        int
+	Factions        []Faction
+	Infrastructures []Infrastructure
+}
+
+type Infrastructure struct {
+	Name  string
+	Type  string
+	State string
+	InUse bool
 }

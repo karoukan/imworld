@@ -29,35 +29,51 @@ func main() {
 				Size:       10,
 				Population: 10000,
 				Location:   1,
-				Factions: []Faction{
+				Districts: []District{
 					{
-						id:         1,
-						Name:       "MegaCorp",
-						Strength:   2,
-						Ideology:   "Neutral",
-						Reputation: 1,
-						Type:       "enterprise",
-						Members:    100,
-						Alive:      true,
-						Resources: Resources{
-							Credits:   10,
-							Influence: 15,
-							Data:      2,
-						},
-					},
-					{
-						id:         2,
-						Name:       "GHOST",
-						Strength:   3,
-						Ideology:   "Xeno",
-						Reputation: 1,
-						Members:    100,
-						Type:       "collectif",
-						Alive:      true,
-						Resources: Resources{
-							Credits:   10,
-							Influence: 4,
-							Data:      12,
+						Name:            "Mineral Zone",
+						Population:      10000,
+						Size:            10,
+						Infrastructures: []Infrastructure{{}},
+						Factions: []Faction{
+							{
+								id:         1,
+								Name:       "MegaCorp",
+								Strength:   2,
+								Ideology:   "Neutral",
+								Reputation: 1,
+								Type:       "enterprise",
+								Members:    100,
+								Alive:      true,
+								Memory: []Memory{
+									{
+										Age:   4,
+										Where: "Sector A",
+										Who:   "GHOST",
+										What:  "Attack",
+									},
+								},
+								Resources: Resources{
+									Credits:   10,
+									Influence: 15,
+									Data:      2,
+								},
+							},
+							{
+								id:         2,
+								Name:       "GHOST",
+								Strength:   3,
+								Ideology:   "Xeno",
+								Reputation: 1,
+								Members:    100,
+								Type:       "collectif",
+								Alive:      true,
+								Resources: Resources{
+									Credits:   10,
+									Influence: 4,
+									Data:      12,
+								},
+							},
 						},
 					},
 				},
@@ -81,35 +97,39 @@ func main() {
 				Size:       5,
 				Population: 1000,
 				Location:   2,
-				Factions: []Faction{
+				Districts: []District{
 					{
-						id:         1,
-						Name:       "Nova",
-						Strength:   8,
-						Ideology:   "Loyal",
-						Reputation: 1,
-						Members:    100,
-						Type:       "classified",
-						Alive:      true,
-						Resources: Resources{
-							Credits:   10,
-							Influence: 4,
-							Data:      12,
-						},
-					},
-					{
-						id:         2,
-						Name:       "EmpirzSec",
-						Strength:   6,
-						Ideology:   "Bad",
-						Reputation: 1,
-						Type:       "mafia",
-						Members:    100,
-						Alive:      true,
-						Resources: Resources{
-							Credits:   10,
-							Influence: 10,
-							Data:      2,
+						Factions: []Faction{
+							{
+								id:         1,
+								Name:       "Nova",
+								Strength:   8,
+								Ideology:   "Loyal",
+								Reputation: 1,
+								Members:    100,
+								Type:       "classified",
+								Alive:      true,
+								Resources: Resources{
+									Credits:   10,
+									Influence: 4,
+									Data:      12,
+								},
+							},
+							{
+								id:         2,
+								Name:       "EmpirzSec",
+								Strength:   6,
+								Ideology:   "Bad",
+								Reputation: 1,
+								Type:       "mafia",
+								Members:    100,
+								Alive:      true,
+								Resources: Resources{
+									Credits:   10,
+									Influence: 10,
+									Data:      2,
+								},
+							},
 						},
 					},
 				},
@@ -129,28 +149,30 @@ func main() {
 			newPopulation := population(&world, s)
 			world.Sectors[s].Population = newPopulation
 
-			for k := 0; k < len(world.Sectors[s].Events); k++ {
-				for i := 0; i < len(world.Sectors[s].Factions); i++ {
+			for i := 0; i < len(world.Sectors[s].Factions); i++ {
 
-					membersJoined := rand.Intn(100)
-					if membersJoined > 17 && newPopulation >= 100 && world.Sectors[s].Factions[i].Alive == true {
-						populationJoinFaction(&world, s, i, newPopulation)
-						fmt.Println(world.Sectors[s].Factions[i].Name, "TOTAL MEMBER:", world.Sectors[s].Factions[i].Members)
-					}
-
-					if world.Sectors[s].Harvest == true && world.Sectors[s].Factions[i].Alive == true {
-						gathering(&world, s, i)
-						fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
-					}
-
-					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
-					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
-					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
-					// 	for
-					// }
-					war(&world, &world.Sectors[s], i)
-					world.Sectors[s].Harvest = true
+				membersJoined := rand.Intn(100)
+				if membersJoined > 17 && newPopulation >= 100 && world.Sectors[s].Factions[i].Alive == true {
+					populationJoinFaction(&world, s, i, newPopulation)
+					fmt.Println(world.Sectors[s].Factions[i].Name, "TOTAL MEMBER:", world.Sectors[s].Factions[i].Members)
 				}
+
+				if world.Sectors[s].Harvest == true && world.Sectors[s].Factions[i].Alive == true {
+					gathering(&world, s, i)
+					fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
+				}
+
+				// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
+				// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
+				// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
+				// 	for
+				// }
+				if world.Sectors[s].Factions[i].Alive == true {
+					// initTrade(&world, &world.Sectors[s], i)
+					// war(&world, &world.Sectors[s], i)
+				}
+
+				world.Sectors[s].Harvest = true
 			}
 		}
 	}
