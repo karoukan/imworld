@@ -209,8 +209,10 @@ func main() {
 					// }
 
 					if district_l.Factions[AllFactions].Alive == true {
-						initTrade(&world, &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
-						war(&world, &world.Sectors[AllSectors], &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+						// initTrade(&world, &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+						// war(&world, &world.Sectors[AllSectors], &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+						action := decide(&world, &world.Sectors[AllFactions], district_l, AllFactions)
+						fmt.Println(action)
 					}
 				}
 				world.Sectors[AllSectors].Harvest = true

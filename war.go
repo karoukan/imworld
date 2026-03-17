@@ -10,173 +10,95 @@ func endwar(d *District, i int) {
 	d.Factions[i].Strength = 2
 }
 
-func war(w *World, s *Sector, d *District, attacker int) {
-	fight := rand.Intn(20)
+func state(d *District, defender int, attacker int, bonusWar int) {
+	d.Factions[attacker].War = true
+	fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
+	baseBonusWar := bonusWar
+	for d.Factions[attacker].War == true && d.Factions[defender].War == true {
+		//Fight conditions
+		bonusWar = baseBonusWar * 100 / d.Factions[defender].Members
+		attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
+		attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
 
-	if fight > 17 {
-		if d.Factions[attacker].War != true {
-			d.Factions[attacker].War = true
-			s.Harvest = false
+		// if defenderFaction == 0 {
+		// 	d.Factions[attacker].War = false
+		// 	d.Factions[defender].War = false
+		// 	endwar(d, attacker)
+		// 	break
+		// }
 
-			for defender := 0; defender < len(d.Factions); defender++ {
-				bonusWar := warMemory(d, d.Factions[attacker].Name, defender)
-
-				if attacker != defender && d.Factions[defender].War == false && d.Factions[defender].Alive == true {
-					fmt.Println(d.Factions[attacker].Name, " PREPARE FOR WAR")
-					switch d.Factions[attacker].Type {
-					case "enterprise":
-						if d.Factions[defender].Resources.Credits > 5 {
-							d.Factions[defender].War = true
-							fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
-
-							for d.Factions[attacker].War == true && d.Factions[defender].War == true {
-								//Fight conditions
-								attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
-								attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
-
-								if defenderFaction == 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								d.Factions[attacker].Members = attackerMembersTotal
-								d.Factions[defender].Members = defenderMembersTotal
-
-								d.Factions[attacker].Resources.Credits = attackerFaction
-								d.Factions[defender].Resources.Credits = defenderFaction
-
-								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
-								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
-
-							}
-						}
-					case "collectif":
-						if d.Factions[defender].Resources.Data > 5 {
-							d.Factions[defender].War = true
-							fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
-
-							for d.Factions[attacker].War == true && d.Factions[defender].War == true {
-								//Fight conditions
-								attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
-								attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
-
-								if defenderFaction == 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								d.Factions[attacker].Members = attackerMembersTotal
-								d.Factions[defender].Members = defenderMembersTotal
-
-								d.Factions[attacker].Resources.Credits = attackerFaction
-								d.Factions[defender].Resources.Credits = defenderFaction
-
-								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
-								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
-
-							}
-						}
-					case "mafia":
-						if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 100 {
-							d.Factions[defender].War = true
-							fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
-
-							for d.Factions[attacker].War == true && d.Factions[defender].War == true {
-								//Fight conditions
-								attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
-								attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
-
-								if defenderFaction == 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								d.Factions[attacker].Members = attackerMembersTotal
-								d.Factions[defender].Members = defenderMembersTotal
-
-								d.Factions[attacker].Resources.Credits = attackerFaction
-								d.Factions[defender].Resources.Credits = defenderFaction
-
-								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
-								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
-
-							}
-						}
-					case "classified":
-						if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 50 {
-							d.Factions[defender].War = true
-							fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
-
-							for d.Factions[attacker].War == true && d.Factions[defender].War == true {
-								//Fight conditions
-								attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
-								attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
-
-								if defenderFaction == 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								if defenderMembersTotal <= 0 || attackerMembersTotal <= 0 {
-									d.Factions[attacker].War = false
-									d.Factions[defender].War = false
-									endwar(d, attacker)
-									break
-								}
-
-								d.Factions[attacker].Members = attackerMembersTotal
-								d.Factions[defender].Members = defenderMembersTotal
-
-								d.Factions[attacker].Resources.Credits = attackerFaction
-								d.Factions[defender].Resources.Credits = defenderFaction
-
-								fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
-								fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
-
-							}
-						}
-					}
-
-					d.Factions[defender].Memory = append(d.Factions[defender].Memory, Memory{
-						Age:   w.WorldTimer,
-						Who:   d.Factions[attacker].Name,
-						Where: d.Name,
-						What:  "Attack",
-					})
-				}
-			}
+		if attackerMembersTotal <= 0 {
 			d.Factions[attacker].War = false
+			d.Factions[defender].War = false
+			endwar(d, attacker)
+			break
+		}
+
+		if defenderMembersTotal <= 0 {
+			d.Factions[attacker].War = false
+			d.Factions[defender].War = false
+			endwar(d, defender)
+			break
+		}
+
+		d.Factions[attacker].Members = attackerMembersTotal
+		d.Factions[defender].Members = defenderMembersTotal
+
+		d.Factions[attacker].Resources.Credits = attackerFaction
+		d.Factions[defender].Resources.Credits = defenderFaction
+
+		if d.Factions[attacker].Resources.Credits <= 1 || d.Factions[defender].Resources.Credits <= 1 {
+			d.Factions[attacker].War = false
+			d.Factions[defender].War = false
+			break
+		}
+
+		fmt.Println("TOTAL RESOURCES:", attackerFaction, defenderFaction)
+		fmt.Println("DIE TOTAL:", attackerMembersTotal, defenderMembersTotal)
+
+	}
+}
+
+func war(w *World, s *Sector, d *District, attacker int) {
+	s.Harvest = false
+	for defender := 0; defender < len(d.Factions); defender++ {
+		if rand.Intn(20) > 17 {
+
+			bonusWar := warMemory(d, d.Factions[attacker].Name, defender)
+
+			if attacker != defender && d.Factions[defender].War == false && d.Factions[defender].Alive == true {
+				fmt.Println(d.Factions[attacker].Name, " PREPARE FOR WAR")
+				d.Factions[defender].War = true
+
+				switch d.Factions[attacker].Type {
+				case "enterprise":
+					if d.Factions[defender].Resources.Credits > 5 {
+						state(d, defender, attacker, bonusWar)
+					}
+				case "collectif":
+					if d.Factions[defender].Resources.Data > 5 {
+						state(d, defender, attacker, bonusWar)
+					}
+				case "mafia":
+					if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 100 {
+						state(d, defender, attacker, bonusWar)
+					}
+				case "classified":
+					if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 50 {
+						state(d, defender, attacker, bonusWar)
+					}
+				}
+
+				d.Factions[defender].Memory = append(d.Factions[defender].Memory, Memory{
+					Age:   w.WorldTimer,
+					Who:   d.Factions[attacker].Name,
+					Where: d.Name,
+					What:  "Attack",
+				})
+			}
 		}
 	}
+	d.Factions[attacker].War = false
 }
 
 func warMemory(d *District, attacker string, defender int) int {
