@@ -60,8 +60,10 @@ type District struct {
 }
 
 type Infrastructure struct {
-	Name  string
-	Type  string
-	State string //Maintenance, Ready, Building (+ de states plus tard)
-	InUse bool   //Signifie que des gens y travaille (Ready ou Maintenance), Building (en cours de construction donc false)
+	Name string
+	Type string
+	// GeneratedRessources string
+	State        string //Maintenance, Ready, Building (+ de states plus tard)
+	InUse        bool   //Signifie que des gens y travaille (Ready ou Maintenance), Building (en cours de construction donc false)
+	ControlledBy string
 }

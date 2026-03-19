@@ -5,12 +5,12 @@ import (
 	"math/rand"
 )
 
-func endwar(d *District, i int) {
-	d.Factions[i].Resources.Credits = 2
-	d.Factions[i].Strength = 2
+func endwar(d *District, faction int) {
+	d.Factions[faction].Resources.Credits = 2
+	d.Factions[faction].Strength = 2
 }
 
-func state(d *District, defender int, attacker int, bonusWar int) {
+func state(w *World, d *District, defender int, attacker int, bonusWar int) {
 	d.Factions[attacker].War = true
 	fmt.Println(d.Factions[defender].Name, "vs", d.Factions[attacker].Name)
 	baseBonusWar := bonusWar
@@ -18,7 +18,7 @@ func state(d *District, defender int, attacker int, bonusWar int) {
 		//Fight conditions
 		bonusWar = baseBonusWar * 100 / d.Factions[defender].Members
 		attackerFaction, defenderFaction := steal(d.Factions[attacker].Resources.Credits, d.Factions[defender].Resources.Credits, bonusWar)
-		attackerMembersTotal, defenderMembersTotal := memberDie(d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
+		attackerMembersTotal, defenderMembersTotal := memberDie(w, d, attacker, defender, d.Factions[attacker].Members, d.Factions[defender].Members)
 
 		// if defenderFaction == 0 {
 		// 	d.Factions[attacker].War = false
@@ -26,10 +26,10 @@ func state(d *District, defender int, attacker int, bonusWar int) {
 		// 	endwar(d, attacker)
 		// 	break
 		// }
-
 		if attackerMembersTotal <= 0 {
 			d.Factions[attacker].War = false
 			d.Factions[defender].War = false
+
 			endwar(d, attacker)
 			break
 		}
@@ -73,19 +73,19 @@ func war(w *World, s *Sector, d *District, attacker int) {
 				switch d.Factions[attacker].Type {
 				case "enterprise":
 					if d.Factions[defender].Resources.Credits > 5 {
-						state(d, defender, attacker, bonusWar)
+						state(w, d, defender, attacker, bonusWar)
 					}
 				case "collectif":
 					if d.Factions[defender].Resources.Data > 5 {
-						state(d, defender, attacker, bonusWar)
+						state(w, d, defender, attacker, bonusWar)
 					}
 				case "mafia":
 					if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 100 {
-						state(d, defender, attacker, bonusWar)
+						state(w, d, defender, attacker, bonusWar)
 					}
 				case "classified":
 					if d.Factions[defender].Resources.Credits > 5 && d.Factions[defender].Members > 50 {
-						state(d, defender, attacker, bonusWar)
+						state(w, d, defender, attacker, bonusWar)
 					}
 				}
 
@@ -113,7 +113,7 @@ func warMemory(d *District, attacker string, defender int) int {
 	return d.Factions[defender].Strength + count
 }
 
-func memberDie(d *District, attacker, defender, attMembersTotal int, defMembersTotal int) (int, int) {
+func memberDie(w *World, d *District, attacker, defender, attMembersTotal int, defMembersTotal int) (int, int) {
 	memberDieAtt := rand.Intn(10)
 	memberDieDef := rand.Intn(10)
 
@@ -123,16 +123,33 @@ func memberDie(d *District, attacker, defender, attMembersTotal int, defMembersT
 	if dieAttMembers <= 0 {
 		d.Factions[attacker].Alive = false
 		dieAttMembers = 0
+		controlledByChangeName(w, d, attacker, defender)
 		fmt.Println(d.Factions[attacker].Name, "HAS GONE")
 	}
 
 	if dieDefMembers <= 0 {
 		d.Factions[defender].Alive = false
 		dieDefMembers = 0
+		controlledByChangeName(w, d, defender, attacker)
 		fmt.Println(d.Factions[defender].Name, "HAS GONE")
 	}
 
 	return dieAttMembers, dieDefMembers
+}
+
+func controlledByChangeName(w *World, d *District, owner int, newOwner int) {
+	for AllInfrastructure := 0; AllInfrastructure < len(d.Infrastructures); AllInfrastructure++ {
+		if d.Infrastructures[AllInfrastructure].ControlledBy == d.Factions[owner].Name {
+			d.Infrastructures[AllInfrastructure].ControlledBy = d.Factions[newOwner].Name
+			fmt.Println("INFRA TAKEN")
+			d.Factions[owner].Memory = append(d.Factions[owner].Memory, Memory{
+				Age:   w.WorldTimer,
+				Who:   d.Factions[newOwner].Name,
+				Where: d.Name,
+				What:  "Infrastructure lost",
+			})
+		}
+	}
 }
 
 func steal(attRes int, defRes int, bonusWar int) (int, int) { // Steal resource during ATTACK

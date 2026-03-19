@@ -11,7 +11,9 @@ func decide(w *World, s *Sector, d *District, myFaction int) string {
 	// Si elle veut une ressources elle peut soit TRADE pour l'avoir SOIT attaquer
 	// Si les elements ne sont pas en sa faveur elle peut ne rien faire
 	// En fonction de son choix il faut le retourner pour choisir l'action à venir
-	data, credit, influence, scoutResultFaction := scouting(d, myFaction)
+	data, credit, influence, scoutResultFaction := scoutingRessources(d, myFaction)
+	totalOwned, totalNotOwned := scountingInfrastructures(d, myFaction)
+
 	delta := 0
 
 	if data > 0 || credit > 0 || influence > 0 || d.Factions[scoutResultFaction].Alive == true {
@@ -32,7 +34,20 @@ func decide(w *World, s *Sector, d *District, myFaction int) string {
 
 		delta = 2 * d.Factions[myFaction].Resources.Credits
 
-		if delta < d.Factions[scoutResultFaction].Resources.Credits {
+		//Si une faction en un < que l'autre alors, on l'attaque
+		//j'ai déjà le total de toute les faction dans total
+
+		// for scountResultInfra := 0; scountResultInfra < len(d.Infrastructures); scountResultInfra++ {
+		// 	if d.Infrastructures[scountResultInfra].ControlledBy
+		// 	fmt.Println(d.Infrastructures[scountResultInfra].Name, d.Infrastructures[scountResultInfra].ControlledBy)
+		// 	// if len(d.Infrastructures[total].ControlledBy) < total {
+		// 	//
+		// 	// }
+		// 	fmt.Println("WAR ?", scountResultInfra)
+		// 	fmt.Println("WAR ?", total)
+		// }
+
+		if delta < d.Factions[scoutResultFaction].Resources.Credits || totalOwned < totalNotOwned {
 			action = "war"
 		}
 
@@ -49,7 +64,25 @@ func decide(w *World, s *Sector, d *District, myFaction int) string {
 	return "nothing"
 }
 
-func scouting(d *District, myFaction int) (int, int, int, int) {
+func scountingInfrastructures(d *District, myFaction int) (int, int) {
+	totalOwned := 0
+	totalNotOwned := 0
+	for scountResultInfra := 0; scountResultInfra < len(d.Infrastructures); scountResultInfra++ {
+
+		if d.Infrastructures[scountResultInfra].ControlledBy == d.Factions[myFaction].Name {
+			totalOwned++
+		}
+
+		if d.Infrastructures[scountResultInfra].ControlledBy != d.Factions[myFaction].Name && d.Infrastructures[scountResultInfra].ControlledBy != "" {
+			totalNotOwned++
+		}
+
+	}
+
+	return totalOwned, totalNotOwned
+}
+
+func scoutingRessources(d *District, myFaction int) (int, int, int, int) {
 
 	for scoutResultFaction := 0; scoutResultFaction < len(d.Factions); scoutResultFaction++ { // Pour chaque autre faction du district
 		if myFaction != scoutResultFaction && d.Factions[scoutResultFaction].Alive == true { //Je m'exclue pour garder que les autres

@@ -34,12 +34,22 @@ func main() {
 						Name:       "Ker-Uhel",
 						Population: 5000,
 						Size:       1,
-						Infrastructures: []Infrastructure{{
-							Name:  "Monee",
-							Type:  "Bank",
-							State: "Ready",
-							InUse: true,
-						}},
+						Infrastructures: []Infrastructure{
+							{
+								Name:         "Monee",
+								Type:         "Bank",
+								State:        "Ready",
+								InUse:        true,
+								ControlledBy: "MegaCorp",
+							},
+							{
+								Name:         "Le Super Jaudy",
+								Type:         "Market",
+								State:        "Ready",
+								InUse:        true,
+								ControlledBy: "MegaCorp",
+							},
+						},
 						Factions: []Faction{
 							{
 								id:         1,
@@ -86,10 +96,11 @@ func main() {
 						Population: 5000,
 						Size:       1,
 						Infrastructures: []Infrastructure{{
-							Name:  "L'entrepot",
-							Type:  "Warehouse",
-							State: "Ready",
-							InUse: true,
+							Name:         "Odyssea",
+							Type:         "Datacenter",
+							State:        "Ready",
+							InUse:        true,
+							ControlledBy: "",
 						}},
 						Factions: []Faction{},
 					},
@@ -120,10 +131,11 @@ func main() {
 						Population: 450,
 						Size:       2,
 						Infrastructures: []Infrastructure{{
-							Name:  "Anormal Material Labs",
-							Type:  "Research Center",
-							State: "Maintenance",
-							InUse: true,
+							Name:         "Anormal Material Labs",
+							Type:         "Research Center",
+							State:        "Maintenance",
+							ControlledBy: "Nova",
+							InUse:        true,
 						}},
 						Factions: []Faction{
 							{
@@ -163,10 +175,11 @@ func main() {
 						Population: 550,
 						Size:       3,
 						Infrastructures: []Infrastructure{{
-							Name:  "Freewoman",
-							Type:  "Factory",
-							State: "Building",
-							InUse: false,
+							Name:         "Freewoman",
+							Type:         "Factory",
+							State:        "Building",
+							InUse:        false,
+							ControlledBy: "",
 						}},
 						Factions: []Faction{},
 					},
@@ -189,9 +202,41 @@ func main() {
 
 			for AllDistricts := 0; AllDistricts < len(world.Sectors[AllSectors].Districts); AllDistricts++ { //Fetch sur tous les districts
 				district_l := &world.Sectors[AllSectors].Districts[AllDistricts]
-				// sector_l := &world.Sectors[AllSectors]
+
+				for AllInfrastructure := 0; AllInfrastructure < len(district_l.Infrastructures); AllInfrastructure++ {
+					if len(district_l.Infrastructures[AllInfrastructure].ControlledBy) != 0 {
+
+						for nFaction := 0; nFaction < len(district_l.Factions); nFaction++ {
+
+							if district_l.Factions[nFaction].Name == district_l.Infrastructures[AllInfrastructure].ControlledBy {
+								if district_l.Infrastructures[AllInfrastructure].InUse == true {
+									switch district_l.Infrastructures[AllInfrastructure].Type {
+									case "Bank":
+										district_l.Factions[nFaction].Resources.Credits += 10
+										fmt.Println(district_l.Infrastructures[AllInfrastructure].ControlledBy, "CONTROLED", district_l.Infrastructures[AllInfrastructure].Name, "HAS GAINED MORE CREDITS", district_l.Factions[nFaction].Resources.Credits)
+									case "Factory":
+										district_l.Factions[nFaction].Resources.Credits += 5
+									case "Market":
+										district_l.Factions[nFaction].Resources.Credits += 5
+									case "Datacenter":
+										district_l.Factions[nFaction].Resources.Data += 10
+									case "Research Center":
+										if district_l.Factions[nFaction].Resources.Credits <= 4 {
+											district_l.Infrastructures[AllInfrastructure].InUse = false
+											break
+										}
+
+										district_l.Factions[nFaction].Resources.Data += 15
+										district_l.Factions[nFaction].Resources.Credits -= 5
+									}
+								}
+							}
+						}
+					}
+				}
 				for AllFactions := 0; AllFactions < len(district_l.Factions); AllFactions++ { //Fetch sur toutes les factions
 					membersJoined := rand.Intn(100)
+
 					if membersJoined > 17 && newPopulation >= 100 && district_l.Factions[AllFactions].Alive == true {
 						populationJoinFaction(&world, AllSectors, AllDistricts, AllFactions, newPopulation)
 						fmt.Println(district_l.Factions[AllFactions].Name, "TOTAL MEMBER:", district_l.Factions[AllFactions].Members)
@@ -209,14 +254,25 @@ func main() {
 					// }
 
 					if district_l.Factions[AllFactions].Alive == true {
-						// initTrade(&world, &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
-						// war(&world, &world.Sectors[AllSectors], &world.Sectors[AllSectors].Districts[AllDistricts], AllFactions)
+						for AllInfrastructure := 0; AllInfrastructure < len(district_l.Infrastructures); AllInfrastructure++ { //Fetch toutes les infra
+							//On fetch toutes les infra pour filter celle qui sont dans mon district et qui n'ont pas de propriétaire
+							//Si on en trouve on se l'approprie si on peut payer 50 cr sinon on passe
+
+							if len(district_l.Infrastructures[AllInfrastructure].ControlledBy) == 0 { // !=0 pour avoir les infra controlled et ==0 pour les dispo
+								if district_l.Factions[AllFactions].Resources.Credits >= 51 {
+									district_l.Factions[AllFactions].Resources.Credits -= 50
+									district_l.Infrastructures[AllInfrastructure].ControlledBy = district_l.Factions[AllFactions].Name
+									fmt.Println(district_l.Infrastructures[AllInfrastructure].ControlledBy, "ACQUIRED ", district_l.Infrastructures[AllInfrastructure].Name)
+								}
+							}
+						}
+
 						action := decide(&world, &world.Sectors[AllFactions], district_l, AllFactions)
 						fmt.Println(action)
 					}
 				}
-				world.Sectors[AllSectors].Harvest = true
 			}
+			world.Sectors[AllSectors].Harvest = true
 		}
 	}
 }
