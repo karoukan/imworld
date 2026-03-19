@@ -203,6 +203,28 @@ func main() {
 			for AllDistricts := 0; AllDistricts < len(world.Sectors[AllSectors].Districts); AllDistricts++ { //Fetch sur tous les districts
 				district_l := &world.Sectors[AllSectors].Districts[AllDistricts]
 
+				// si un district n'a pas faction alors on peut ajouter une nouvelle faction
+				if len(district_l.Factions) == 0 || len(district_l.Factions) < 2 {
+					names := []string{"Nexus", "Vortex", "Syndicate", "Phantom", "Onyx"}
+					types := []string{"enterprise", "collectif", "mafia", "classified"}
+					randomName := rand.Intn(len(names))
+					randomType := rand.Intn(len(types))
+					district_l.Factions = append(district_l.Factions, Faction{
+						Name:       names[randomName],
+						Strength:   rand.Intn(6),
+						Ideology:   "Bad",
+						Reputation: 1,
+						Type:       types[randomType],
+						Members:    rand.Intn(50),
+						Alive:      true,
+						Resources: Resources{
+							Credits:   rand.Intn(10),
+							Influence: rand.Intn(10),
+							Data:      rand.Intn(10),
+						},
+					})
+				}
+
 				for AllInfrastructure := 0; AllInfrastructure < len(district_l.Infrastructures); AllInfrastructure++ {
 					if len(district_l.Infrastructures[AllInfrastructure].ControlledBy) != 0 {
 

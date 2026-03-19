@@ -16,6 +16,10 @@ func decide(w *World, s *Sector, d *District, myFaction int) string {
 
 	delta := 0
 
+	if scoutResultFaction == -1 {
+		return "nothing"
+	}
+
 	if data > 0 || credit > 0 || influence > 0 || d.Factions[scoutResultFaction].Alive == true {
 		action := "trade"
 		for mem := 0; mem < len(d.Factions[myFaction].Memory); mem++ {
@@ -103,5 +107,5 @@ func scoutingRessources(d *District, myFaction int) (int, int, int, int) {
 		}
 	}
 
-	return 0, 0, 0, 0
+	return 0, 0, 0, -1
 }
