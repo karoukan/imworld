@@ -252,30 +252,40 @@ func main() {
 
 				}
 
+				// ageInfrastructure := 0
+
 				for AllInfrastructure := 0; AllInfrastructure < len(district_l.Infrastructures); AllInfrastructure++ {
 					if len(district_l.Infrastructures[AllInfrastructure].ControlledBy) != 0 {
 						for nFaction := 0; nFaction < len(district_l.Factions); nFaction++ {
 
 							if district_l.Factions[nFaction].Name == district_l.Infrastructures[AllInfrastructure].ControlledBy {
-								if district_l.Infrastructures[AllInfrastructure].InUse == true {
-									switch district_l.Infrastructures[AllInfrastructure].Type {
-									case "Bank":
-										district_l.Factions[nFaction].Resources.Credits += 10
-										fmt.Println(district_l.Infrastructures[AllInfrastructure].ControlledBy, "CONTROLED", district_l.Infrastructures[AllInfrastructure].Name, "HAS GAINED MORE CREDITS", district_l.Factions[nFaction].Resources.Credits)
-									case "Factory":
-										district_l.Factions[nFaction].Resources.Credits += 5
-									case "Market":
-										district_l.Factions[nFaction].Resources.Credits += 5
-									case "Datacenter":
-										district_l.Factions[nFaction].Resources.Data += 10
-									case "Research Center":
-										if district_l.Factions[nFaction].Resources.Credits <= 4 {
-											district_l.Infrastructures[AllInfrastructure].InUse = false
-											break
-										}
+								if district_l.Infrastructures[AllInfrastructure].InUse == true && district_l.Infrastructures[AllInfrastructure].State == "Ready" {
+									ageInfrastructure := world.WorldTimer - district_l.Infrastructures[AllInfrastructure].StartSince
+									if ageInfrastructure < 20 {
+										switch district_l.Infrastructures[AllInfrastructure].Type {
+										case "Bank":
+											district_l.Factions[nFaction].Resources.Credits += 10
 
-										district_l.Factions[nFaction].Resources.Data += 15
-										district_l.Factions[nFaction].Resources.Credits -= 5
+										case "Factory":
+											district_l.Factions[nFaction].Resources.Credits += 5
+										case "Market":
+											district_l.Factions[nFaction].Resources.Credits += 5
+										case "Datacenter":
+											district_l.Factions[nFaction].Resources.Data += 10
+										case "Research Center":
+											if district_l.Factions[nFaction].Resources.Credits <= 4 {
+												district_l.Infrastructures[AllInfrastructure].InUse = false
+												break
+											}
+
+											district_l.Factions[nFaction].Resources.Data += 15
+											district_l.Factions[nFaction].Resources.Credits -= 5
+										}
+									}
+
+									if ageInfrastructure >= 20 {
+										district_l.Infrastructures[AllInfrastructure].State = "Maintenance"
+										district_l.Infrastructures[AllInfrastructure].OperationsSince = world.WorldTimer
 									}
 								}
 
@@ -301,7 +311,9 @@ func main() {
 					}
 
 					misery(district_l)
-
+					repair(district_l, &world)
+					opaHostile(district_l, &world)
+					archMaintenance(district_l, &world)
 					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
 					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
 					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)
@@ -317,6 +329,7 @@ func main() {
 								if district_l.Factions[AllFactions].Resources.Credits >= 51 {
 									district_l.Factions[AllFactions].Resources.Credits -= 50
 									district_l.Infrastructures[AllInfrastructure].ControlledBy = district_l.Factions[AllFactions].Name
+									district_l.Infrastructures[AllInfrastructure].StartSince = world.WorldTimer
 									fmt.Println(district_l.Infrastructures[AllInfrastructure].ControlledBy, "ACQUIRED ", district_l.Infrastructures[AllInfrastructure].Name)
 								}
 							}

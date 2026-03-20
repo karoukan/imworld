@@ -141,6 +141,8 @@ func controlledByChangeName(w *World, d *District, owner int, newOwner int) {
 	for AllInfrastructure := 0; AllInfrastructure < len(d.Infrastructures); AllInfrastructure++ {
 		if d.Infrastructures[AllInfrastructure].ControlledBy == d.Factions[owner].Name {
 			d.Infrastructures[AllInfrastructure].ControlledBy = d.Factions[newOwner].Name
+
+			d.Infrastructures[AllInfrastructure].StartSince = w.WorldTimer
 			fmt.Println("INFRA TAKEN")
 			d.Factions[owner].Memory = append(d.Factions[owner].Memory, Memory{
 				Age:   w.WorldTimer,

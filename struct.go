@@ -73,7 +73,10 @@ type Infrastructure struct {
 	Name string
 	Type string
 	// GeneratedRessources string
-	State        string //Maintenance, Ready, Building (+ de states plus tard)
-	InUse        bool   //Signifie que des gens y travaille (Ready ou Maintenance), Building (en cours de construction donc false)
-	ControlledBy string
+	State           string //Maintenance, Ready, Building (+ de states plus tard)
+	InUse           bool   //Signifie que des gens y travaille (Ready ou Maintenance), Building (en cours de construction donc false)
+	ControlledBy    string
+	StartSince      int //Depuis quand l'infra appartient ? (utilisé pour reset la maintenance/ready)
+	MaintenanceCost int //Cout des réparations
+	OperationsSince int //Depuis quand le State à changé ?
 }
