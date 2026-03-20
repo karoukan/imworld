@@ -9,6 +9,16 @@ import (
 func main() {
 	fmt.Println("Imworld")
 	world := World{
+		Government: Gov{
+			Name: "ARCH", //Authority for Regional Civic Harmony
+			Resources: Resources{
+				Credits:   0,
+				Influence: 0,
+				Data:      0,
+			},
+			Members: 100,
+			Taxe:    2,
+		},
 		Sectors: []Sector{
 			{
 				Harvest: true,
@@ -199,35 +209,51 @@ func main() {
 
 			newPopulation := population(&world, AllSectors)
 			world.Sectors[AllSectors].Population = newPopulation
-
 			for AllDistricts := 0; AllDistricts < len(world.Sectors[AllSectors].Districts); AllDistricts++ { //Fetch sur tous les districts
 				district_l := &world.Sectors[AllSectors].Districts[AllDistricts]
 
 				// si un district n'a pas faction alors on peut ajouter une nouvelle faction
-				if len(district_l.Factions) == 0 || len(district_l.Factions) < 2 {
+				aliveCount := 0
+				for i := 0; i < len(district_l.Factions); i++ {
+					if district_l.Factions[i].Alive == true {
+						aliveCount++
+					}
+				}
+
+				if len(district_l.Factions) == 0 || aliveCount < 2 {
+
 					names := []string{"Nexus", "Vortex", "Syndicate", "Phantom", "Onyx"}
 					types := []string{"enterprise", "collectif", "mafia", "classified"}
 					randomName := rand.Intn(len(names))
 					randomType := rand.Intn(len(types))
-					district_l.Factions = append(district_l.Factions, Faction{
-						Name:       names[randomName],
-						Strength:   rand.Intn(6),
-						Ideology:   "Bad",
-						Reputation: 1,
-						Type:       types[randomType],
-						Members:    rand.Intn(50),
-						Alive:      true,
-						Resources: Resources{
-							Credits:   rand.Intn(10),
-							Influence: rand.Intn(10),
-							Data:      rand.Intn(10),
-						},
-					})
+					nameAlreadyTaken := false
+					for checkFactionName := 0; checkFactionName < len(district_l.Factions); checkFactionName++ {
+						if district_l.Factions[checkFactionName].Name == names[randomName] {
+							nameAlreadyTaken = true
+							break
+						}
+					}
+					if nameAlreadyTaken == false {
+						district_l.Factions = append(district_l.Factions, Faction{
+							Name:       names[randomName],
+							Strength:   rand.Intn(6),
+							Ideology:   "Bad",
+							Reputation: 1,
+							Type:       types[randomType],
+							Members:    rand.Intn(50),
+							Alive:      true,
+							Resources: Resources{
+								Credits:   rand.Intn(10),
+								Influence: rand.Intn(10),
+								Data:      rand.Intn(10),
+							},
+						})
+					}
+
 				}
 
 				for AllInfrastructure := 0; AllInfrastructure < len(district_l.Infrastructures); AllInfrastructure++ {
 					if len(district_l.Infrastructures[AllInfrastructure].ControlledBy) != 0 {
-
 						for nFaction := 0; nFaction < len(district_l.Factions); nFaction++ {
 
 							if district_l.Factions[nFaction].Name == district_l.Infrastructures[AllInfrastructure].ControlledBy {
@@ -252,6 +278,11 @@ func main() {
 										district_l.Factions[nFaction].Resources.Credits -= 5
 									}
 								}
+
+								afterfee, feePocketGov := tax(district_l, &world, nFaction)
+								district_l.Factions[nFaction].Resources.Credits = afterfee
+								world.Government.Resources.Credits = feePocketGov
+								fmt.Println(world.Government.Name, "GOV TAXE ", afterfee, feePocketGov)
 							}
 						}
 					}
@@ -287,9 +318,10 @@ func main() {
 									fmt.Println(district_l.Infrastructures[AllInfrastructure].ControlledBy, "ACQUIRED ", district_l.Infrastructures[AllInfrastructure].Name)
 								}
 							}
+
 						}
 
-						action := decide(&world, &world.Sectors[AllFactions], district_l, AllFactions)
+						action := decide(&world, &world.Sectors[AllSectors], district_l, AllFactions)
 						fmt.Println(action)
 					}
 				}

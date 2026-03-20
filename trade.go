@@ -31,7 +31,7 @@ func initTrade(w *World, d *District, faction int) {
 				}
 			}
 
-			if canTrade {
+			if canTrade && faction != otherFaction {
 				switch d.Factions[faction].Type {
 				case "enterprise":
 					exchangeTo, exchangeAt := exchange(d.Factions[faction].Resources.Credits, d.Factions[otherFaction].Resources.Data, 50, 1, 10)

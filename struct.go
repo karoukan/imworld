@@ -3,6 +3,7 @@ package main
 type World struct {
 	WorldTimer int
 	Sectors    []Sector
+	Government Gov
 }
 
 type Event struct {
@@ -37,6 +38,14 @@ type Faction struct {
 	Alive      bool
 }
 
+type Gov struct {
+	Name      string
+	Resources Resources
+	Members   int //Nombre d'adhérents
+	Taxe      int
+	Memory    []Memory
+}
+
 type Resources struct {
 	Data      int
 	Influence int
@@ -55,6 +64,7 @@ type District struct {
 	Name            string
 	Size            int
 	Location        int
+	Misery          int
 	Factions        []Faction
 	Infrastructures []Infrastructure
 }
