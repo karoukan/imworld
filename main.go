@@ -68,7 +68,7 @@ func main() {
 								Ideology:   "Neutral",
 								Reputation: 1,
 								Type:       "enterprise",
-								Members:    100,
+								Members:    rand.Intn(50),
 								Alive:      true,
 								Memory: []Memory{
 									{
@@ -90,7 +90,7 @@ func main() {
 								Strength:   3,
 								Ideology:   "Xeno",
 								Reputation: 1,
-								Members:    100,
+								Members:    rand.Intn(50),
 								Type:       "collectif",
 								Alive:      true,
 								Resources: Resources{
@@ -154,7 +154,7 @@ func main() {
 								Strength:   8,
 								Ideology:   "Loyal",
 								Reputation: 1,
-								Members:    100,
+								Members:    rand.Intn(50),
 								Type:       "classified",
 								Alive:      true,
 								Resources: Resources{
@@ -170,7 +170,7 @@ func main() {
 								Ideology:   "Bad",
 								Reputation: 1,
 								Type:       "mafia",
-								Members:    100,
+								Members:    rand.Intn(50),
 								Alive:      true,
 								Resources: Resources{
 									Credits:   10,
@@ -310,10 +310,13 @@ func main() {
 						fmt.Println(district_l.Factions[AllFactions].Name, "GATHERING:", district_l.Factions[AllFactions].Resources)
 					}
 
+					naturalAttrition(district_l, AllFactions)
+
 					misery(district_l)
 					repair(district_l, &world)
-					opaHostile(district_l, &world)
 					archMaintenance(district_l, &world)
+					opaHostile(district_l, &world)
+
 					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
 					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
 					// 	// fmt.Println(world.Sectors[s].Factions[i].Name, "GATHERING:", world.Sectors[s].Factions[i].Resources)

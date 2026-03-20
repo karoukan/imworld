@@ -58,6 +58,15 @@ func populationJoinFaction(world *World, sector int, district int, faction int, 
 	}
 }
 
+// Faction peuvent perdre des membres : décés, licencements, démissions, etc
+func naturalAttrition(d *District, faction int) {
+	removewMembers := d.Factions[faction].Members * 2 / 100
+
+	if removewMembers > 0 {
+		d.Factions[faction].Members -= removewMembers
+	}
+}
+
 func misery(d *District) int {
 	creditPerFaction := 0
 	for allCreditsFaction := 0; allCreditsFaction < len(d.Factions); allCreditsFaction++ {
