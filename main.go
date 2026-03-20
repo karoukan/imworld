@@ -207,10 +207,10 @@ func main() {
 		for AllSectors := 0; AllSectors < len(world.Sectors); AllSectors++ { //Fetch sur tous les secteurs
 			randomevent(&world, AllSectors)
 
-			newPopulation := population(&world, AllSectors)
-			world.Sectors[AllSectors].Population = newPopulation
 			for AllDistricts := 0; AllDistricts < len(world.Sectors[AllSectors].Districts); AllDistricts++ { //Fetch sur tous les districts
 				district_l := &world.Sectors[AllSectors].Districts[AllDistricts]
+				newPopulation := population(district_l)
+				district_l.Population = newPopulation
 
 				// si un district n'a pas faction alors on peut ajouter une nouvelle faction
 				aliveCount := 0
@@ -299,6 +299,8 @@ func main() {
 						gathering(&world, AllSectors, AllDistricts, AllFactions)
 						fmt.Println(district_l.Factions[AllFactions].Name, "GATHERING:", district_l.Factions[AllFactions].Resources)
 					}
+
+					misery(district_l)
 
 					// if world.Sectors[s].Factions[i].Strength >= 2 && world.Sectors[s].Harvest == true {
 					// 	//world.Sectors[s].Factions[i].Resources += +world.Sectors[s].Factions[i].Strength
